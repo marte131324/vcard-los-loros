@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>La Casa de los Loros - Pedidos a Domicilio</title>
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Comida a domicilio en La Casa de los Loros. Pide fácilmente por WhatsApp.">
+    <meta property="og:title" content="La Casa de los Loros - Menú Digital">
+    <meta property="og:description" content="Haz tus pedidos de comida a domicilio directamente por WhatsApp.">
+    <meta property="og:image" content="https://vcard-los-loros.vercel.app/assets/LOGO.jpeg?v=1">
+    <meta property="og:image:width" content="500">
+    <meta property="og:image:height" content="500">
+    <meta property="og:image:type" content="image/jpeg">
+    <link rel="icon" href="assets/LOGO.jpeg" type="image/jpeg">
+    <link rel="apple-touch-icon" href="assets/LOGO.jpeg">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Intro.js CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intro.js/7.2.0/introjs.min.css">
+    
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css?v=3">
+</head>
+<body>
+    <!-- Splash Screen -->
+    <div id="splash-screen">
+        <div class="splash-content">
+            <div class="splash-logo-container">
+                <video src="assets/mascota.webm" autoplay loop muted playsinline alt="Loro Restaurante" class="splash-mascot" style="background:transparent; pointer-events:none;"></video>
+                <div class="smoke-effect"></div>
+            </div>
+            <h1 class="splash-title">La Casa de <span>los Loros</span></h1>
+            <p class="splash-subtitle">Preparando tu menú...</p>
+        </div>
+    </div>
+
+    <!-- Closed Store Overlay (Dynamic) -->
+    <div id="closed-overlay" class="hidden">
+        <div class="closed-card">
+            <i class="fa-solid fa-moon"></i>
+            <h2>¡Estamos Descansando!</h2>
+            <p>Por ahora nuestra cocina está cerrada.</p>
+            <div class="closed-hours">
+                <small>Volvemos en nuestro horario habitual:</small>
+                <strong>Lun-Vie: 8:00 a.m. a 2:30 p.m.</strong>
+                <strong>Sáb: 8:00 a.m. a 12:00 p.m.</strong>
+            </div>
+            <button class="btn btn-primary" onclick="closeStoreMessage()">Ver Menú de todas formas</button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main id="main-content" class="hidden">
+        <!-- Header Section -->
+        <header class="vcard-header" id="main-header">
+            <div class="header-overlay" id="header-parallax"></div>
+            <div class="header-content glass-effect">
+                <div class="hero-mascot-container" data-title="¡Bienvenido a La Casa de los Loros!" data-intro="Tu asistente interactivo te guiará. A través de este menú podrás hacer tu pedido directo a nuestro WhatsApp sin descargar apps.">
+                    <video src="assets/mascota.webm" autoplay loop muted playsinline alt="Loro Host" class="hero-mascot" style="background:transparent;"></video>
+                </div>
+                <h2>La Casa de los Loros</h2>
+                <p class="tagline"><i class="fa-solid fa-motorcycle"></i> Solo entregas a domicilio</p>
+                <div class="schedule-badge">
+                    <span class="status-dot" id="status-dot"></span> 
+                    <span id="status-text">Calculando...</span>
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="btn btn-primary" onclick="scrollToMenu()">
+                        <i class="fa-solid fa-utensils"></i> Ver Menú
+                    </button>
+                    <a href="https://wa.me/522295076655" target="_blank" class="btn btn-whatsapp-header">
+                        <i class="fa-brands fa-whatsapp"></i> Contactar
+                    </a>
+                </div>
+            </div>
+        </header>
+
+        <!-- Chef's Recommendation Banner -->
+        <div class="chef-banner reveal" data-title="Especialidades" data-intro="Aquí encontrarás siempre nuestra recomendación principal o plátillos estrella del día.">
+            <div class="chef-content">
+                <span class="chef-badge">Recomendación de la Casa <i class="fa-solid fa-fire"></i></span>
+                <h3>Chilaquiles Preparados</h3>
+                <p>Nuestros clásicos con Pollo, Bistec, Huevo o Longaniza.</p>
+                <button class="btn btn-small" onclick="openItemModal('d4')">Pedir Ahora</button>
+            </div>
+            <div class="chef-image">
+                <video src="assets/mascota.webm" autoplay loop muted playsinline alt="Recomendacion del Chef" class="mascot-chef" style="background:transparent;"></video>
+            </div>
+        </div>
+
+        <div class="delivery-notice reveal">
+            <div class="notice-icon">
+                <i class="fa-solid fa-motorcycle"></i>
+            </div>
+            <div class="notice-text">
+                <strong>Cobertura a Domicilio</strong>
+                <p>Nuestra zona base abarca <strong>5 cuadras a la redonda</strong>. ¿Estás más lejos? ¡Haremos lo posible por llegar a ti! <a href="https://maps.google.com/?q=19.200356,-96.133507" target="_blank" style="color:var(--primary); font-weight:bold;">Ver ubicación.</a></p>
+            </div>
+        </div>
+
+        <!-- Categories Filter (Sticky with Glassmorphism) -->
+        <section class="menu-categories sticky" data-title="Navegación Rápida" data-intro="Solo toca botones como 'Desayunos' o 'Antojitos' para ver los platillos al instante.">
+            <div class="category-scroll">
+                <button class="category-btn active" data-filter="all">Todos</button>
+                <button class="category-btn" data-filter="especialidades">Especialidades</button>
+                <button class="category-btn" data-filter="antojitos">Antojitos</button>
+                <button class="category-btn" data-filter="desayunos">Desayunos</button>
+                <button class="category-btn" data-filter="bebidas">Bebidas</button>
+            </div>
+        </section>
+
+        <!-- Menu Section -->
+        <section id="menu-section" class="menu-container">
+            <div class="section-title">
+                <h3>Nuestro Menú</h3>
+                <p>Toca el platillo para personalizar tu orden</p>
+            </div>
+
+            <div class="menu-items" id="menu-list">
+                <!-- Items will be generated by JS -->
+            </div>
+        </section>
+
+        <!-- Information Section -->
+        <section class="info-section reveal">
+            <div class="info-card">
+                <h3><i class="fa-solid fa-clock"></i> Horario de Atención</h3>
+                <ul class="schedule-list">
+                    <li><span>Lunes a Viernes:</span> <strong>8:00 a.m - 2:30 p.m.</strong></li>
+                    <li><span>Sábados:</span> <strong>8:00 a.m - 12:00 p.m.</strong></li>
+                    <li class="closed-day"><span>Domingos:</span> <strong>DESCANSAMOS</strong></li>
+                </ul>
+            </div>
+
+            <div class="info-card extras-card reveal">
+                <h3><i class="fa-solid fa-plus-circle"></i> Costos Extras</h3>
+                <ul class="extras-list">
+                    <li><span>Todo Ingrediente Extra:</span> <strong>$15</strong></li>
+                    <li><span>Orden de tortillas a mano (4 Pzas.):</span> <strong>$20</strong></li>
+                </ul>
+            </div>
+
+            <div class="info-card bank-card reveal">
+                <h3><i class="fa-solid fa-credit-card"></i> Transferencia</h3>
+                <p>Si prefieres pagar por transferencia, toca el botón para ver nuestros datos bancarios.</p>
+                <button class="btn btn-secondary" onclick="toggleBankModal()" style="width:100%; margin-top:15px; background:var(--primary); color:white;">
+                    <i class="fa-solid fa-money-bill-transfer"></i> Ver Datos Bancarios
+                </button>
+            </div>
+        </section>
+
+        <!-- Floating Cart Button -->
+        <div class="floating-cart" id="floating-cart" onclick="toggleCart()" data-title="Tu Pedido" data-intro="Tus platillos se organizarán aquí. ¡Tócalo cuando estés listo para enviar tu orden!">
+            <div class="cart-icon">
+                <i class="fa-solid fa-basket-shopping"></i>
+                <span class="cart-badge" id="cart-count">0</span>
+            </div>
+            <div class="cart-text">Ver Pedido</div>
+            <div class="cart-total" id="cart-total-float">$0.00</div>
+        </div>
+
+        <!-- Item Customization Modal -->
+        <div id="item-modal" class="custom-modal">
+            <div class="modal-overlay" onclick="closeItemModal()"></div>
+            <div class="modal-content">
+                <i class="fa-solid fa-times close-modal" onclick="closeItemModal()"></i>
+                <div class="modal-header">
+                    <h3 id="modal-item-name">Nombre del Platillo</h3>
+                    <div class="modal-price" id="modal-item-price">$0.00</div>
+                </div>
+                <p class="modal-desc" id="modal-item-desc">Descripción</p>
+                
+                <div class="modal-options">
+                    <!-- Dynamic Variants Container -->
+                    <div id="modal-variants-container"></div>
+
+                    <div class="option-group">
+                        <label id="modal-pref-label">Especificaciones Generales / Aderezos</label>
+                        <input type="text" id="modal-pref" class="modal-input" placeholder="Ej: Salsa verde, Sin cebolla, Ranch...">
+                    </div>
+                    
+                    <div class="option-group" id="modal-extra-group">
+                        <label class="checkbox-container">
+                            <input type="checkbox" id="modal-extra">
+                            <span class="checkmark"></span>
+                            Ingrediente Extra (+$15.00)
+                        </label>
+                    </div>
+                    <div class="option-group" id="modal-tortillas-group">
+                        <label class="checkbox-container">
+                            <input type="checkbox" id="modal-tortillas">
+                            <span class="checkmark"></span>
+                            Orden de Tortillas a mano (+$20.00)
+                        </label>
+                    </div>
+                </div>
+
+                <div class="modal-actions">
+                    <div class="qty-selector">
+                        <button onclick="changeModalQty(-1)">-</button>
+                        <span id="modal-qty">1</span>
+                        <button onclick="changeModalQty(1)">+</button>
+                    </div>
+                    <button class="btn btn-primary add-to-cart-btn" onclick="confirmAddToCart()">
+                        Agregar - <span id="modal-total-btn">$0.00</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cart Checkout Modal -->
+        <div id="cart-modal" class="cart-modal">
+            <div class="cart-overlay" onclick="toggleCart()"></div>
+            <div class="cart-content">
+                <div class="cart-header">
+                    <h3>Tu Pedido</h3>
+                    <button class="close-cart" onclick="toggleCart()"><i class="fa-solid fa-times"></i></button>
+                </div>
+                
+                <div class="cart-body">
+                    <div class="cart-items" id="cart-items-list">
+                        <!-- Items here -->
+                        <div class="empty-cart-msg">
+                            <video src="assets/mascota.webm" autoplay loop muted playsinline alt="Loro esperando" class="mascot-cart" style="background:transparent;"></video>
+                            <p>¡El Loro sigue esperando en la cocina! Agrega los ingredientes para tu espectacular pedido.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="delivery-form" id="delivery-form" style="display:none;">
+                        <h4><i class="fa-solid fa-motorcycle"></i> Datos de Envío</h4>
+                        
+                        <div class="form-group">
+                            <label>Tu Nombre</label>
+                            <input type="text" id="client-name" placeholder="¿Cómo te llamas?" class="form-control">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Zona de Envío</label>
+                            <select id="delivery-zone" class="form-control" onchange="updateCartTotals()">
+                                <option value="0" disabled selected>Selecciona tu envío...</option>
+                                <option value="999">Zona Extendida ($) (A confirmar con el repartidor)</option>
+                                <option value="0">Pasaré a recoger mi pedido ($0)</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Dirección (Calle y No.)</label>
+                            <input type="text" id="client-address" placeholder="Ej. Av. Independencia #123" class="form-control">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Referencias (Opcional)</label>
+                            <input type="text" id="client-refs" placeholder="Ej. Casa verde junto a la tienda" class="form-control">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="cart-footer">
+                    <div class="cart-summary">
+                        <span>Subtotal:</span>
+                        <h4 id="cart-subtotal">$0.00</h4>
+                    </div>
+                    <div class="cart-summary" id="shipping-row" style="display:none;">
+                        <span>Envío:</span>
+                        <h4 id="cart-shipping">$0.00</h4>
+                    </div>
+                    <div class="cart-summary total-row">
+                        <span>Total:</span>
+                        <h3 id="cart-grand-total">$0.00</h3>
+                    </div>
+                    
+                    <button id="checkout-btn" class="btn checkout-btn" onclick="processCheckout()" disabled>
+                        <i class="fa-brands fa-whatsapp"></i> <span id="btn-text-checkout">Pedir por WhatsApp</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- Bank Details Modal -->
+        <div id="bank-modal" class="custom-modal">
+            <div class="modal-overlay" onclick="toggleBankModal()"></div>
+            <div class="modal-content">
+                <i class="fa-solid fa-times close-modal" onclick="toggleBankModal()"></i>
+                <div class="modal-header">
+                    <h3>Datos Bancarios</h3>
+                    <p>Toca el botón <i class="fa-solid fa-copy"></i> para copiar cada dato.</p>
+                </div>
+                
+                <div class="bank-details-list">
+                    <div class="bank-row">
+                        <label>Banco</label>
+                        <div class="copy-input-group">
+                            <span id="bank-name-text">BBVA</span>
+                            <button onclick="copyToClipboard('bank-name-text', this)"><i class="fa-solid fa-copy"></i></button>
+                        </div>
+                    </div>
+                    
+                    <div class="bank-row">
+                        <label>Nombre del Titular</label>
+                        <div class="copy-input-group">
+                            <span id="bank-holder-text">La Casa de los Loros</span>
+                            <button onclick="copyToClipboard('bank-holder-text', this)"><i class="fa-solid fa-copy"></i></button>
+                        </div>
+                    </div>
+                    
+                    <div class="bank-row">
+                        <label>CLABE Interbancaria</label>
+                        <div class="copy-input-group">
+                            <span id="bank-clabe-text">012345678901234567</span>
+                            <button onclick="copyToClipboard('bank-clabe-text', this)"><i class="fa-solid fa-copy"></i></button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer" style="margin-top:20px; text-align:center;">
+                    <p style="font-size:0.8rem; color:var(--text-muted);">Recuerda enviar tu comprobante por WhatsApp una vez realizado el pago.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Help / Tour Button -->
+        <button class="floating-help" onclick="startTour()">
+            <i class="fa-solid fa-circle-info"></i> Tour
+        </button>
+    </main>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/intro.js/7.2.0/intro.min.js"></script>
+    <script src="js/app.js?v=11"></script>
+
+<!-- TREZE SIGNATURE -->
+<a href="https://wa.me/522214092478?text=Hola%20Treze%20Labs%2C%20me%20gustar%C3%ADa%20solicitar%20el%20desarrollo%20de%20un%20sistema%20profesional." target="_blank" style="display: flex; justify-content: center; text-decoration: none; margin-top: 24px; margin-bottom: 24px; opacity: 0.6; transition: opacity 0.3s ease;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.6'">
+    <img src="assets/footer.png" alt="Ingeniería Digital por Treze Labs" style="max-height: 38px; object-fit: contain; filter: brightness(0);">
+</a>
+
+</body>
+</html>

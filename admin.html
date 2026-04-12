@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administración - Los Loros</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1B5E20;
+            --secondary: #D84315;
+            --bg: #f8f9fa;
+            --surface: #ffffff;
+            --text: #333;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--text); padding-bottom: 30px; }
+        
+        header { 
+            background: var(--primary); color: white; padding: 25px 20px; 
+            text-align: center; border-bottom-left-radius: 20px; border-bottom-right-radius: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .container { max-width: 600px; margin: 20px auto; padding: 0 20px; }
+        
+        /* Auth Screen */
+        #auth-screen {
+            height: 80vh; display: flex; flex-direction: column; justify-content: center; align-items: center;
+        }
+        .auth-card {
+            background: white; padding: 30px; border-radius: 20px; width: 100%;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center;
+        }
+        .auth-card i { font-size: 3rem; color: var(--primary); margin-bottom: 20px; }
+        input[type="password"], input[type="number"] {
+            width: 100%; padding: 15px; border: 1px solid #ddd; border-radius: 12px;
+            font-size: 1rem; margin-bottom: 15px; outline: none;
+        }
+        .btn {
+            background: var(--primary); color: white; border: none; padding: 15px 30px;
+            border-radius: 12px; font-weight: 700; width: 100%; cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .btn:active { transform: scale(0.98); }
+        .btn-emergency { background: #e53935; margin-bottom: 10px; }
+        .btn-emergency.active { background: #43a047; }
+
+        /* Admin Content */
+        #admin-content { display: none; }
+        .status-card {
+            background: white; padding: 20px; border-radius: 15px; margin-bottom: 20px;
+            display: flex; justify-content: space-between; align-items: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+        
+        .product-item {
+            background: white; padding: 15px; border-radius: 12px; margin-bottom: 10px;
+            display: flex; justify-content: space-between; align-items: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .product-info h4 { font-size: 0.9rem; margin-bottom: 4px; color: var(--primary); }
+        .price-input-group { display: flex; align-items: center; gap: 8px; max-width: 120px; }
+        .price-input-group span { font-weight: 700; }
+
+        .hidden { display: none; }
+        
+        .loading {
+            position: fixed; inset: 0; background: rgba(255,255,255,0.8);
+            display: none; justify-content: center; align-items: center; z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+        .spinner {
+            width: 40px; height: 40px; border: 4px solid var(--primary); 
+            border-top-color: transparent; border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        .floating-save {
+            position: fixed; bottom: 20px; left: 20px; right: 20px;
+            background: var(--primary); color: white; padding: 18px;
+            border-radius: 15px; text-align: center; font-weight: 800;
+            box-shadow: 0 10px 25px rgba(27, 94, 32, 0.4); cursor: pointer;
+            display: flex; justify-content: center; align-items: center; gap: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Panel Lector / Editor</h1>
+        <p>Control de Precios y Disponibilidad</p>
+    </header>
+
+    <div class="container" id="auth-screen">
+        <div class="auth-card">
+            <i class="fa-solid fa-lock"></i>
+            <h3>Acceso Seguro</h3>
+            <p style="margin-bottom: 20px; font-size: 0.9rem; color: #666;">Ingresa la llave maestra para continuar</p>
+            <input type="password" id="master-key-input" placeholder="Tu Contraseña">
+            <button class="btn" onclick="checkAuth()">Ingresar al Panel</button>
+        </div>
+    </div>
+
+    <div class="container" id="admin-content">
+        <div class="status-card">
+            <div>
+                <strong>Estatus del Negocio</strong>
+                <p id="status-desc" style="font-size: 0.8rem; color: #666;">Cerrado hoy por imprevistos?</p>
+            </div>
+            <button id="emergency-btn" class="btn btn-emergency" style="width: auto;" onclick="toggleEmergency()">
+                <i class="fa-solid fa-power-off"></i> CERRAR AHORA
+            </button>
+        </div>
+
+        <div class="status-card" style="display: block;">
+            <h3 style="margin-bottom: 15px; color: var(--primary);"><i class="fa-solid fa-building-columns"></i> Configuración de Pagos</h3>
+            
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; font-size: 0.8rem; font-weight: bold; color: #666; margin-bottom: 5px;">Banco (Alias)</label>
+                <input type="text" id="bank-name-input" placeholder="Ej: BBVA" style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 10px;" onchange="updateBankLocal('bankName', this.value)">
+            </div>
+            
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; font-size: 0.8rem; font-weight: bold; color: #666; margin-bottom: 5px;">Titular de la Cuenta</label>
+                <input type="text" id="bank-holder-input" placeholder="Nombre completo" style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 10px;" onchange="updateBankLocal('holderName', this.value)">
+            </div>
+            
+            <div style="margin-bottom: 5px;">
+                <label style="display: block; font-size: 0.8rem; font-weight: bold; color: #666; margin-bottom: 5px;">CLABE Interbancaria (18 dígitos)</label>
+                <input type="text" id="bank-clabe-input" placeholder="012345..." style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 10px;" maxlength="18" onchange="updateBankLocal('clabe', this.value)">
+            </div>
+        </div>
+
+        <h3 style="margin: 20px 0 10px; color: var(--primary);">Catálogo de Productos</h3>
+        <div id="product-list">
+            <!-- Items load here -->
+        </div>
+        
+        <div style="height: 100px;"></div> <!-- Spacer for fixed button -->
+    </div>
+
+    <div id="save-bar" class="floating-save hidden" onclick="saveChanges()">
+        <i class="fa-solid fa-cloud-arrow-up"></i> GUARDAR CAMBIOS EN LA NUBE
+    </div>
+
+    <div class="loading" id="loader">
+        <div class="spinner"></div>
+    </div>
+
+    <script>
+        const BIN_ID = "69c4caffb7ec241ddca4897f";
+        let masterKey = "";
+        let currentRecord = null;
+
+        function checkAuth() {
+            masterKey = document.getElementById('master-key-input').value.trim();
+            if(!masterKey) return alert("Ingresa tu contraseña");
+            loadData();
+        }
+
+        async function loadData() {
+            showLoader(true);
+            try {
+                const response = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
+                    headers: { "X-Master-Key": masterKey }
+                });
+                
+                if(!response.ok) throw new Error("Llave incorrecta o error de conexión");
+                
+                const data = await response.json();
+                currentRecord = data.record;
+                renderAdminPanel();
+                
+                document.getElementById('auth-screen').style.display = 'none';
+                document.getElementById('admin-content').style.display = 'block';
+                document.getElementById('save-bar').classList.remove('hidden');
+            } catch (error) {
+                alert(error.message);
+            } finally {
+                showLoader(false);
+            }
+        }
+
+        function renderAdminPanel() {
+            const list = document.getElementById('product-list');
+            list.innerHTML = "";
+            
+            // Render Status
+            const btn = document.getElementById('emergency-btn');
+            const desc = document.getElementById('status-desc');
+            if(currentRecord.isEmergencyClosed) {
+                btn.innerHTML = '<i class="fa-solid fa-check"></i> RE-ABRIR NEGOCIO';
+                btn.className = "btn btn-emergency active";
+                desc.textContent = "¡CUIDADO! El negocio está CERRADO manualmente.";
+            } else {
+                btn.innerHTML = '<i class="fa-solid fa-power-off"></i> CERRAR AHORA';
+                btn.className = "btn btn-emergency";
+                desc.textContent = "El negocio sigue sus horarios normales.";
+            }
+
+            // Render Bank Details
+            if(!currentRecord.bankDetails) {
+                currentRecord.bankDetails = {
+                    bankName: "BBVA",
+                    holderName: "La Casa de los Loros",
+                    clabe: "012345678901234567"
+                };
+            }
+            
+            document.getElementById('bank-name-input').value = currentRecord.bankDetails.bankName || "";
+            document.getElementById('bank-holder-input').value = currentRecord.bankDetails.holderName || "";
+            document.getElementById('bank-clabe-input').value = currentRecord.bankDetails.clabe || "";
+
+            // Render Items
+            currentRecord.menuData.forEach((item, idx) => {
+                const div = document.createElement('div');
+                div.className = "product-item";
+                div.innerHTML = `
+                    <div class="product-info">
+                        <h4>${item.name}</h4>
+                        <small style="color:#888">${item.category}</small>
+                    </div>
+                    <div class="price-input-group">
+                        <span>$</span>
+                        <input type="number" value="${item.price}" onchange="updateLocalPrice(${idx}, this.value)">
+                    </div>
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        function updateLocalPrice(index, newVal) {
+            currentRecord.menuData[index].price = parseFloat(newVal);
+        }
+
+        function updateBankLocal(field, newVal) {
+            if(!currentRecord.bankDetails) currentRecord.bankDetails = {};
+            currentRecord.bankDetails[field] = newVal.trim();
+        }
+
+        function toggleEmergency() {
+            currentRecord.isEmergencyClosed = !currentRecord.isEmergencyClosed;
+            renderAdminPanel();
+            
+            // Show alert/notice
+            const notice = currentRecord.isEmergencyClosed ? "⚠️ Has marcado el negocio como CERRADO. No olvides GUARDAR CAMBIOS PARA QUE SE APLIQUE." : "✅ Has marcado el negocio como ABIERTO. No olvides GUARDAR CAMBIOS PARA QUE SE APLIQUE.";
+            alert(notice);
+        }
+
+        async function saveChanges() {
+            showLoader(true);
+            try {
+                const response = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
+                    method: 'PUT',
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-Master-Key": masterKey
+                    },
+                    body: JSON.stringify(currentRecord)
+                });
+                
+                if(response.ok) {
+                    alert("✅ ¡Cambios guardados con éxito! Se verán reflejados en la tarjeta en unos minutos (o limpia tu cache).");
+                } else {
+                    throw new Error("Error al guardar");
+                }
+            } catch (error) {
+                alert("Error: " + error.message);
+            } finally {
+                showLoader(false);
+            }
+        }
+
+        function showLoader(show) {
+            document.getElementById('loader').style.display = show ? 'flex' : 'none';
+        }
+    </script>
+</body>
+</html>
