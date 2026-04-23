@@ -30,7 +30,7 @@ const PRODUCT_VARIANTS = {
     },
     "Huevos al Gusto": {
         title: "¿Cómo los prefieres?",
-        options: ["Jamón", "Tocino", "A la Mexicana", "Estrellados", "Divorciados", "Chorizo", "Longaniza", "Salchicha"],
+        options: ["Jamón", "Chorizo", "Longaniza", "Salchicha", "A la Mexicana", "Tirados"],
         required: true
     },
     "Omelette": {
@@ -50,6 +50,11 @@ const PRODUCT_VARIANTS = {
             required: true
         }
     ],
+    "Chilaquiles": {
+        title: "Elige tu salsa",
+        options: ["Salsa Verde", "Salsa Roja"],
+        required: true
+    },
     "Entomatadas, Enchiladas Preparadas": {
         title: "Elige el ingrediente principal",
         options: ["Pollo", "Picadillo", "Huevo"],
