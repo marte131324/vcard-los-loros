@@ -174,9 +174,15 @@ async function loadMenuData() {
     }
 
     try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 3000);
+        
         const response = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
-            headers: { "X-Master-Key": API_KEY }
+            headers: { "X-Master-Key": API_KEY },
+            signal: controller.signal
         });
+        clearTimeout(timeoutId);
+        
         const data = await response.json();
         menuData = data.record.menuData;
         isEmergencyClosed = data.record.isEmergencyClosed;
@@ -222,7 +228,7 @@ let pulseTimeout;
 
 document.addEventListener("DOMContentLoaded", async () => {
     // Show splash, then load data in background
-    const splashPromise = new Promise(resolve => setTimeout(resolve, 5000));
+    const splashPromise = new Promise(resolve => setTimeout(resolve, 1500));
     
     // Load menu data
     await loadMenuData();
